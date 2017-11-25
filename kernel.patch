@@ -1,0 +1,66 @@
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index fb0be67..67ff8f8 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -869,4 +869,6 @@ asmlinkage long sys_kcmp(pid_t pid1, pid_t pid2, int type,
+ asmlinkage long sys_finit_module(int fd, const char __user *uargs, int flags);
+ asmlinkage long sys_seccomp(unsigned int op, unsigned int flags,
+ 			    const char __user *uargs);
++asmlinkage long sys_etimer(void);
++asmlinkage long sys_dtimer(void);
+ #endif
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index b422ad5..e9b243e 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -703,8 +703,13 @@ __SYSCALL(__NR_renameat2, sys_renameat2)
+ #define __NR_seccomp 277
+ __SYSCALL(__NR_seccomp, sys_seccomp)
+ 
++#define __NR_etimer 278
++__SYSCALL(__NR_etimer, sys_etimer)
++
++#define __NR_dtimer 279
++__SYSCALL(__NR_dtimer, sys_dtimer)
+ #undef __NR_syscalls
+-#define __NR_syscalls 278
++#define __NR_syscalls 280
+ 
+ /*
+  * All syscalls below here should go away really,
+diff --git a/kernel/sys.c b/kernel/sys.c
+index a3bef5b..288d413 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -64,6 +64,7 @@
+ #include <asm/uaccess.h>
+ #include <asm/io.h>
+ #include <asm/unistd.h>
++#include "enable_timer.h"
+ 
+ #ifndef SET_UNALIGN_CTL
+ # define SET_UNALIGN_CTL(a,b)	(-EINVAL)
+@@ -2596,6 +2597,16 @@ SYSCALL_DEFINE1(sysinfo, struct sysinfo __user *, info)
+ 	return 0;
+ }
+ 
++SYSCALL_DEFINE0(etimer) {
++    on_each_cpu(enable_cpu_counters, NULL, 1);
++    return 0;
++}
++
++SYSCALL_DEFINE0(dtimer) {
++    on_each_cpu(disable_cpu_counters, NULL, 1);
++    return 0;
++}
++
+ #ifdef CONFIG_COMPAT
+ struct compat_sysinfo {
+ 	s32 uptime;
+@@ -2660,4 +2671,6 @@ COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
+ 
+ 	return 0;
+ }
++
++
+ #endif /* CONFIG_COMPAT */
