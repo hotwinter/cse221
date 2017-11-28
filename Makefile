@@ -1,5 +1,5 @@
 CC=aarch64-linux-android-gcc
-CFLAGS=-c -Wall -fPIE -pie -I ./include
+CFLAGS=-c -Wall -fPIE -pie -I ./include -O0
 LDFLAGS=-lm -pie -fPIE
 SOURCES=cpu.c
 OBJECTS=$(SOURCES:.c=.o)

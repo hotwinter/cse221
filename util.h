@@ -22,7 +22,6 @@
 
 #define __NR_etimer 278
 #define __NR_dtimer 279
-#define LOOPS 10000
 #define SAMPLE 10
 #define WARMUP 3
 
@@ -106,9 +105,9 @@ void setup() {
 }
 
 
-void experiment(uint64_t (*func)(void), const char *desc) {
+void experiment(float (*func)(void), const char *desc, int its, int trial) {
     int i, j, indx;
-    uint64_t val;
+    float val;
     float res[SAMPLE];
     float average = 0;
     float sd = 0;
@@ -117,22 +116,25 @@ void experiment(uint64_t (*func)(void), const char *desc) {
     // Cache warmup
     for(i = 0; i < SAMPLE + WARMUP; i++) {
         val = 0;
-        for(j = 0; j < LOOPS; j++) {
+        reset_all_counters();
+        for(j = 0; j < its; j++) {
             val += (*func)();
         }
         if (i >= WARMUP) {
             indx = i - WARMUP;
-            res[indx] = ((float) val) / ((float) LOOPS);
+            res[indx] = ((float) val) / ((float) its);
             average += res[indx];
-            printf("Trial %d: %lf\n", indx, res[indx]);
+            if (trial) {
+                printf("Trial %d: %.2lf\n", indx, res[indx]);
+            }
         }
     }
 
     average /= ((float) SAMPLE);
-    printf("Average: %lf\n", average);
+    printf("Average: %.2lf\n", average);
     for(i = 0; i < SAMPLE; i++) {
         sd += pow(res[i] - average, 2);
     }
     sd = sqrt(sd / (float) SAMPLE);
-    printf("Standard Deviation: %lf\n", sd);
+    printf("Standard Deviation: %.2lf\n", sd);
 }
