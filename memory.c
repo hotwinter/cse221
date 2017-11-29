@@ -5,8 +5,11 @@
 #define MEASUREMENT_OVERHEAD 104.77
 // Loop overhead under -O2
 #define LOOP_OVERHEAD 0.38
-// 16MB
-#define ALLOC_SIZE 16777216
+// 4MB
+#define ARRAY_SIZE 8388608
+//#define ALLOC_SIZE 128
+//#define STEP_SIZE 2097152
+#define STEP_SIZE 1
 #define CPU_FREQ 2300000000.0
 // 2GB
 #define FILE_SIZE 2147483648
@@ -63,9 +66,11 @@ void do_access_time() {
 
 float read_time(void *args) {
     int *array;
-    int sum, i;
+    int *curr;
+    int *last;
+    int sum;
     uint64_t prev, after;
-    int array_size = ALLOC_SIZE / sizeof(int);
+    int array_size = ARRAY_SIZE / sizeof(int);
     
     array = (int *) malloc(array_size * sizeof(int));
     if (array == NULL) {
@@ -73,22 +78,61 @@ float read_time(void *args) {
         exit(1);
     }
 
+    last = array + array_size;
+    curr = array;
     sum = 0;
     prev = read_counter();
+    /*
     for(i = 0; i < array_size; i++) {
         sum += array[i];
+    }*/
+    while (curr != last) {
+        sum += curr[0] + 
+              curr[1] + 
+              curr[2] + 
+              curr[3] + 
+              curr[4] + 
+              curr[5] + 
+              curr[6] + 
+              curr[7] + 
+              curr[8] + 
+              curr[9] + 
+              curr[10] + 
+              curr[11] + 
+              curr[12] + 
+              curr[13] + 
+              curr[14] + 
+              curr[15] + 
+              curr[16] + 
+              curr[17] + 
+              curr[18] + 
+              curr[19] + 
+              curr[20] + 
+              curr[21] + 
+              curr[22] + 
+              curr[23] + 
+              curr[24] + 
+              curr[25] + 
+              curr[26] + 
+              curr[27] + 
+              curr[28] + 
+              curr[29] + 
+              curr[30] + 
+              curr[31];
+        curr += 32;
     }
     after = read_counter();
     free(array);
     *(int *)args = sum;
-    return (float) (after - prev - MEASUREMENT_OVERHEAD - array_size * LOOP_OVERHEAD);
+    return (float) (after - prev - MEASUREMENT_OVERHEAD);
 }
 
 float write_time(void *args) {
     int *array;
-    int i;
+    int *curr;
+    int *last;
     uint64_t prev, after;
-    int array_size = ALLOC_SIZE / sizeof(int);
+    int array_size = ARRAY_SIZE / sizeof(int);
     
     array = (int *) malloc(array_size * sizeof(int));
     if (array == NULL) {
@@ -96,20 +140,58 @@ float write_time(void *args) {
         exit(1);
     }
 
+    last = array + array_size;
+    curr = array;
     prev = read_counter();
+    /*
     for(i = 0; i < array_size; i++) {
         array[i] = i;
+    }*/
+    while(curr != last) {
+        curr[0] = 0;
+        curr[1] = 1;
+        curr[2] = 2;
+        curr[3] = 3;
+        curr[4] = 4;
+        curr[5] = 5;
+        curr[6] = 6;
+        curr[7] = 7;
+        curr[8] = 8;
+        curr[9] = 9;
+        curr[10] = 10;
+        curr[11] = 11;
+        curr[12] = 12;
+        curr[13] = 13;
+        curr[14] = 14;
+        curr[15] = 15;
+        curr[16] = 16;
+        curr[17] = 17;
+        curr[18] = 18;
+        curr[19] = 19;
+        curr[20] = 20;
+        curr[21] = 21;
+        curr[22] = 22;
+        curr[23] = 23;
+        curr[24] = 24;
+        curr[25] = 25;
+        curr[26] = 26;
+        curr[27] = 27;
+        curr[28] = 28;
+        curr[29] = 29;
+        curr[30] = 30;
+        curr[31] = 31;
+        curr += 32;
     }
     after = read_counter();
     free(array);
-    return (float) (after - prev - MEASUREMENT_OVERHEAD - array_size * LOOP_OVERHEAD) ;
+    return (float) (after - prev - MEASUREMENT_OVERHEAD) ;
 }
 
 float bandwidth(float cycles) {
-    return (ALLOC_SIZE / 1024.0 / 1024.0 / 1024.0) * (CPU_FREQ / cycles);
+    return (ARRAY_SIZE * (CPU_FREQ / cycles)) / 1024.0 / 1024.0 / 1024.0;
 }
 
-void* page_fault_setup(char *fname, int *sfd) {
+char* page_fault_setup(char *fname, int *sfd) {
     int fd;
     void *res;
 
@@ -124,47 +206,42 @@ void* page_fault_setup(char *fname, int *sfd) {
         exit(1);
     }
     *sfd = fd;
-    return res;
+    return (char *) res;
 }
 
-float page_fault_time(void *addr) {
-    int sum;
-    int i;
+float page_fault_time(void *args) {
+    char c;
+    int i, fd;
     int64_t prev, after;
     int it = 100;
-    int *newaddr;
+    char *addr;
 
-    sum = 0;
+    addr = page_fault_setup("hugefile", &fd);
     prev = read_counter();
     for(i = 0; i < it; i++) {
-        newaddr = (int *)((char *)(addr) + (i + 1) * PAGE_SEP);
-        sum += *newaddr;
+        c = addr[(i + 1) * PAGE_SEP];
     }
     after = read_counter();
-    *(int *)addr = sum;
+    *addr = c;
+    munmap(addr, FILE_SIZE);
+    close(fd);
     return (float) (after - prev - MEASUREMENT_OVERHEAD) / (float) it - LOOP_OVERHEAD;
 }
 
 int main(int argc, char **argv) {
-    int nu, fd;
+    int i;
     float readc, writec;
     float bw;
-    void *addr;
 
     setup();
-    /*do_access_time();
-    readc = experiment("2.1 RAM Read Time", read_time, &nu, 100, 0);
+    //do_access_time();
+    readc = experiment("2.1 RAM Read Time", read_time, &i, 100, 0);
     bw = bandwidth(readc);
     printf("Read Bandwidth is %.2f GB/s\n", bw);
     writec = experiment("2.2 RAM Write Time", write_time, NULL, 100, 0);
     bw = bandwidth(writec);
     printf("Write Bandwidth is %.2f GB/s\n", bw);
-    */
-    addr = page_fault_setup("hugefile", &fd);
-    printf("file mapped at %p\n", addr);
-    experiment("3 Page Fault Service Time", page_fault_time, addr, 10, 1);
-    munmap(addr, FILE_SIZE);
-    close(fd);
+    experiment("3 Page Fault Service Time", page_fault_time, NULL, 10, 1);
     disable_counters();
     return 0;
 }
