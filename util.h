@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <sched.h>
 #include <math.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #define isb()        asm volatile("isb" : : : "memory")
 /* All counters, including PMCCNTR_EL0, are disabled/enabled */
@@ -24,7 +26,6 @@
 #define __NR_dtimer 279
 #define SAMPLE 10
 #define WARMUP 3
-
 
 static inline unsigned int armv8_pmu_pmcr_read(void) {
     unsigned int val;
@@ -69,7 +70,7 @@ static inline void enable_counters(void) {
 	}
 }
 
-static inline int disable_counters(void) {
+static inline void disable_counters(void) {
     if (syscall(__NR_dtimer) == -1) {
 		printf("[-] disable counter in kernel failed\n");
 		exit(EXIT_FAILURE);
@@ -104,8 +105,7 @@ void setup() {
     reset_all_counters();
 }
 
-
-void experiment(float (*func)(void), const char *desc, int its, int trial) {
+float experiment(const char *desc, float (*func)(void*), void *args, int its, int trial) {
     int i, j, indx;
     float val;
     float res[SAMPLE];
@@ -118,7 +118,7 @@ void experiment(float (*func)(void), const char *desc, int its, int trial) {
         val = 0;
         reset_all_counters();
         for(j = 0; j < its; j++) {
-            val += (*func)();
+            val += (*func)(args);
         }
         if (i >= WARMUP) {
             indx = i - WARMUP;
@@ -137,4 +137,5 @@ void experiment(float (*func)(void), const char *desc, int its, int trial) {
     }
     sd = sqrt(sd / (float) SAMPLE);
     printf("Standard Deviation: %.2lf\n", sd);
+    return average;
 }

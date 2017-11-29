@@ -12,7 +12,7 @@ struct params {
     uint64_t result;
 };
 
-float readtime_overhead() {
+float readtime_overhead(void *args) {
     uint64_t prev, after;
 
     prev = read_counter();
@@ -20,11 +20,12 @@ float readtime_overhead() {
     return (float)(after - prev);
 }
 
-float loop_overhead() {
+float loop_overhead(void *args) {
     int i;
     uint64_t prev, after;
     prev = read_counter();
     for(i = 0; i < 10000; i++) {
+        asm("");
     }
     after = read_counter();
     return ((float) (after - prev - MEASUREMENT_OVERHEAD)) / 10000.0;
@@ -46,116 +47,87 @@ void func6(int a1, int a2, int a3, int a4, int a5, int a6) {}
 
 void func7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) {}
 
-float func0_overhead() {
+float func_overhead(void *args) {
     uint64_t prev, after;
-    int i;
+    int it, i, nargs;
 
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func0();
+    it = 10000;
+    nargs = *((int *)args);
+    switch(nargs) {
+        case 0:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func0();
+            }
+            after = read_counter();
+            break;
+        case 1:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func1(1);
+            }
+            after = read_counter();
+            break;
+        case 2:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func2(1, 2);
+            }
+            after = read_counter();
+            break;
+        case 3:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func3(1, 2, 3);
+            }
+            after = read_counter();
+            break;
+        case 4:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func4(1, 2, 3, 4);
+            }
+            after = read_counter();
+            break;
+        case 5:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func5(1, 2, 3, 4, 5);
+            }
+            after = read_counter();
+            break;
+        case 6:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func6(1, 2, 3, 4, 5, 6);
+            }
+            after = read_counter();
+            break;
+        case 7:
+            prev = read_counter();
+            for(i = 0; i < it; i++) {
+                func7(1, 2, 3, 4, 5, 6, 7);
+            }
+            after = read_counter();
+            break;
+        default:
+            break;
     }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func1_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func1(1);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func2_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func2(1, 2);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func3_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func3(1, 2, 3);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func4_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func4(1, 2, 3, 4);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func5_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func5(1, 2, 3, 4, 5);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func6_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func6(1, 2, 3, 4, 5, 6);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
-}
-
-float func7_overhead() {
-    uint64_t prev, after;
-    int i;
-
-    prev = read_counter();
-    for(i = 0; i < 10000; i++) {
-        func7(1, 2, 3, 4, 5, 6, 7);
-    }
-    after = read_counter();
-    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / 10000.0);
+    return ((float) (after - prev - MEASUREMENT_OVERHEAD) / it);
 }
 
 void do_procedure_experiment() {
     int i;
     char desc[100];
-    float (*funcs[8])(void) = {func0_overhead, func1_overhead, func2_overhead, func3_overhead,
-                               func4_overhead, func5_overhead, func6_overhead, func7_overhead};
 
     memset(desc, 0, 100);
     for(i = 0; i < 8; i++) {
         snprintf(desc, sizeof(desc), "2. Procedure call overhead (%d)", i);
-        experiment(funcs[i], desc, 10000, 0);
+        experiment(desc, func_overhead, (void *) &i, 10000, 0);
     }
 }
 
-float process_overhead() {
+float process_overhead(void *args) {
     uint64_t prev, after;
     int status;
     pid_t pid;
@@ -172,11 +144,11 @@ float process_overhead() {
     return ((float) (after - prev - MEASUREMENT_OVERHEAD));
 }
 
-void *child_thread(void *arg) {
+void *child_thread(void *args) {
     pthread_exit(NULL);
 }
 
-float kernel_thread_overhead() {
+float kernel_thread_overhead(void *args) {
     uint64_t prev, after;
     pthread_t thread;
 
@@ -187,7 +159,7 @@ float kernel_thread_overhead() {
     return ((float) (after - prev - MEASUREMENT_OVERHEAD));
 }
 
-float context_switch_user() {
+float context_switch_user(void *args) {
     int p[2];
     int shared[2];
     pid_t pid;
@@ -234,7 +206,7 @@ float context_switch_user() {
     return (after - prev - MEASUREMENT_OVERHEAD);
 }
 
-void *context_switch_child(void *arg) {
+void *context_switch_child(void *args) {
     char buf[20];
     const char *message = "test";
     int mlen = strlen(message);
@@ -242,7 +214,7 @@ void *context_switch_child(void *arg) {
     struct params *params;
 
     memset(buf, 0, sizeof(buf));
-    params = (struct params *) arg;
+    params = (struct params *) args;
     read(params->rpipe, buf, mlen);
     after = read_counter();
     params->result = after;
@@ -250,7 +222,7 @@ void *context_switch_child(void *arg) {
     pthread_exit(NULL);
 }
 
-void *kernel_thread(void *arg) {
+void *kernel_thread(void *args) {
     int p[2];
     pthread_t thread; 
     uint64_t prev, after;
@@ -293,12 +265,13 @@ float context_switch_kernel() {
 int main(int argc, char **argv) {
 
     setup();
-    experiment(readtime_overhead, "1.1 Read Time Overhead", 10000, 1);
-    experiment(loop_overhead, "1.2 Loop Overhead", 10000, 1);
+    experiment("1.1 Read Time Overhead", readtime_overhead, NULL, 10000, 1);
+    experiment("1.2 Loop Overhead", loop_overhead, NULL, 10000, 1);
     do_procedure_experiment();
-    experiment(process_overhead, "3.1 Process Overhead", 10000, 1);
-    experiment(kernel_thread_overhead, "3.2 Kernel Process Overhead", 10000, 1);
-    experiment(context_switch_user, "4.1 Process Context Switch Overhead", 1000, 1);
-    experiment(context_switch_kernel, "4.2 Kernel Thread Context Switch Overhead", 1000, 1);
+    experiment("3.1 Process Overhead", process_overhead, NULL, 1000, 1);
+    experiment("3.2 Kernel Process Overhead", kernel_thread_overhead, NULL, 1000, 1);
+    experiment("4.1 Process Context Switch Overhead", context_switch_user, NULL, 1000, 1);
+    experiment("4.2 Kernel Thread Context Switch Overhead", context_switch_kernel, NULL, 1000, 1);
+    disable_counters();
     return 0;
 }
