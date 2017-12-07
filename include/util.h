@@ -8,7 +8,9 @@
 #include <math.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <sys/time.h>
 
+#define CPU_FREQ 2300000000.0
 #define isb()        asm volatile("isb" : : : "memory")
 /* All counters, including PMCCNTR_EL0, are disabled/enabled */
 
@@ -24,6 +26,7 @@
 
 #define __NR_etimer 278
 #define __NR_dtimer 279
+#define __NR_escalate 280
 #define SAMPLE 10
 #define WARMUP 3
 
@@ -63,6 +66,10 @@ static inline uint64_t read_counter(void) {
     return cval;
 }
 
+static inline void read_ms(struct timeval *tim) {
+    gettimeofday(tim, NULL);
+}
+
 static inline void enable_counters(void) {
     if (syscall(__NR_etimer) == -1) {
 		printf("[-] enable counter in kernel failed\n");
@@ -73,6 +80,13 @@ static inline void enable_counters(void) {
 static inline void disable_counters(void) {
     if (syscall(__NR_dtimer) == -1) {
 		printf("[-] disable counter in kernel failed\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static inline void get_root(void) {
+    if (syscall(__NR_escalate) == -1) {
+		printf("[-] get_root failed\n");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -105,7 +119,11 @@ void setup() {
     reset_all_counters();
 }
 
-float experiment(const char *desc, float (*func)(void*), void *args, int its, int trial) {
+float cycle2ms(float cycle) {
+    return cycle / (CPU_FREQ / 1000.0);
+}
+
+float experiment(const char *desc, float (*func)(void*), void *args, int its, int trial, int ms) {
     int i, j, indx;
     float val;
     float res[SAMPLE];
@@ -125,17 +143,32 @@ float experiment(const char *desc, float (*func)(void*), void *args, int its, in
             res[indx] = ((float) val) / ((float) its);
             average += res[indx];
             if (trial) {
-                printf("Trial %d: %.2lf\n", indx, res[indx]);
+                printf("Trial %d: %.2lf", indx, res[indx]);
+                if (ms) {
+                    printf("ms\n");
+                } else {
+                    printf(" cycles\n");
+                }
             }
         }
     }
 
     average /= ((float) SAMPLE);
-    printf("Average: %.2lf\n", average);
+    printf("Average: %.2lf", average);
+    if (ms) {
+        printf("ms\n");
+    } else {
+        printf(" cycles\n");
+    }
     for(i = 0; i < SAMPLE; i++) {
         sd += pow(res[i] - average, 2);
     }
     sd = sqrt(sd / (float) SAMPLE);
-    printf("Standard Deviation: %.2lf\n", sd);
+    printf("Standard Deviation: %.2lf", sd);
+    if (ms) {
+        printf("ms\n");
+    } else {
+        printf(" cycles\n");
+    }
     return average;
 }
