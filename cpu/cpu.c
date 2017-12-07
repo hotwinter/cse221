@@ -264,7 +264,7 @@ float context_switch_kernel() {
 
 int main(int argc, char **argv) {
 
-    setup();
+    setup(0);
     experiment("1.1 Read Time Overhead", readtime_overhead, NULL, 10000, 1, 0);
     experiment("1.2 Loop Overhead", loop_overhead, NULL, 10000, 1, 0);
     do_procedure_experiment();

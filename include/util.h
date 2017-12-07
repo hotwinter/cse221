@@ -112,8 +112,8 @@ void mean() {
     }
 }
 
-void setup() {
-    set_cpu(0);
+void setup(int cpu) {
+    set_cpu(cpu);
     mean();
     enable_counters();
     reset_all_counters();

@@ -8,8 +8,10 @@
 #include <sys/time.h>
 #include "util.h"
 
-#define PACKET_SIZE 44
-//#define DATA "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
+// 1MB
+#define PACKET_SIZE 1048576
+// 100MB
+#define TRANSFER_SIZE 104857600
 
 struct network_info {
     char *ip;
@@ -19,7 +21,6 @@ struct network_info {
 int socket_setup(struct network_info *info) {
     struct sockaddr_in client; 
     int sock, ret;
-    int one = 1;
 
     client.sin_addr.s_addr = inet_addr(info->ip);
     client.sin_family = AF_INET;
@@ -35,40 +36,24 @@ int socket_setup(struct network_info *info) {
         perror("connect");
         exit(EXIT_FAILURE);
     }
-    ret = setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(int));
-    if (ret < 0) {
-        perror("TCP_NODELAY");
-        exit(EXIT_FAILURE);
-    }
     return sock;
 }
 
-void fill(char *buf, int size) {
-    int fd;
-
-    fd = open("/dev/urandom", O_RDONLY);
-    if (fd == -1) {
-        perror("open random");
-        exit(EXIT_FAILURE);
-    }
-    read(fd, buf, size);
-    close(fd);
-    //memcpy(buf, DATA, size);
-}
-
-float rtt(void *args) {
+float bw(void *args) {
     int sock;
     char buf[PACKET_SIZE];
     struct timeval prev, after;
     float result;
+    ssize_t size = 0;
 
     memset(buf, 0, PACKET_SIZE);
-    fill(buf, PACKET_SIZE);
     sock = socket_setup((struct network_info *)args);
     read_ms(&prev);
-    send(sock, buf, PACKET_SIZE, 0);
-    recv(sock, buf, PACKET_SIZE, 0);
+    while(size < TRANSFER_SIZE) {
+        size += recv(sock, buf, PACKET_SIZE, 0);
+    }
     read_ms(&after);
+    printf("%ld\n", size);
     close(sock);
     result = (after.tv_sec - prev.tv_sec) * 1000.0 + (after.tv_usec - prev.tv_usec) / 1000.0;
     return result;
@@ -84,7 +69,7 @@ int main(int argc, char **argv) {
     info.ip = argv[1];
     info.port = atoi(argv[2]);
     setup(1);
-    experiment("1. RTT", rtt, &info, 10, 0, 1);
+    experiment("2. Bandwidth", bw, &info, 1, 0, 1);
     disable_counters();
     return 0;
 }

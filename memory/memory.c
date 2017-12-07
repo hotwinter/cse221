@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
     float readc, writec;
     float bw;
 
-    setup();
+    setup(0);
     do_access_time();
     readc = experiment("2.1 RAM Read Time", read_time, &i, 100, 0, 0);
     bw = bandwidth(readc);
