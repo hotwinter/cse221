@@ -27,8 +27,10 @@
 #define __NR_etimer 278
 #define __NR_dtimer 279
 #define __NR_escalate 280
-#define SAMPLE 10
-#define WARMUP 3
+#define KB(n) ((uint64_t)n*1024)
+#define MB(n) ((uint64_t)n*1024*1024)
+#define GB(n) ((uint64_t)n*1024*1024*1024)
+#define PAGE_SIZE 4096
 
 static inline unsigned int armv8_pmu_pmcr_read(void) {
     unsigned int val;
@@ -123,52 +125,54 @@ float cycle2ms(float cycle) {
     return cycle / (CPU_FREQ / 1000.0);
 }
 
-float experiment(const char *desc, float (*func)(void*), void *args, int its, int trial, int ms) {
-    int i, j, indx;
-    float val;
-    float res[SAMPLE];
-    float average = 0;
+float average(float *measurement, int size) {
+    float total = 0.0;
+    int i;
+
+    for(i = 0; i < size; i++) {
+        total += measurement[i];
+    }
+    return total / size;
+}
+
+float standard_dev(float *measurement, int size, float average) {
+    float sd = 0.0;
+    int i;
+
+    for(i = 0; i < size; i++) {
+        sd += pow(measurement[i] - average, 2);
+    }
+    return sqrt(sd / size);
+}
+
+void clear_cache() {
+    int ret;
+
+    ret = system("echo 3 > /proc/sys/vm/drop_caches");
+    if (ret < 0) {
+        perror("system");
+        exit(EXIT_FAILURE);
+    }
+}
+
+float experiment(const char *desc, float (*func)(void*), void *args, int its, const char *units) {
+    int i;
+    float *res;
+    float mean = 0;
     float sd = 0;
 
     printf("%s\n", desc);
-    // Cache warmup
-    for(i = 0; i < SAMPLE + WARMUP; i++) {
-        val = 0;
+    res = malloc(sizeof(float) * its);
+    for(i = 0; i < its; i++) {
         reset_all_counters();
-        for(j = 0; j < its; j++) {
-            val += (*func)(args);
-        }
-        if (i >= WARMUP) {
-            indx = i - WARMUP;
-            res[indx] = ((float) val) / ((float) its);
-            average += res[indx];
-            if (trial) {
-                printf("Trial %d: %.2lf", indx, res[indx]);
-                if (ms) {
-                    printf("ms\n");
-                } else {
-                    printf(" cycles\n");
-                }
-            }
-        }
+        res[i] = (*func)(args);
+        //printf("Trial %d: %.2lf\n", i, res[i]);
     }
 
-    average /= ((float) SAMPLE);
-    printf("Average: %.2lf", average);
-    if (ms) {
-        printf("ms\n");
-    } else {
-        printf(" cycles\n");
-    }
-    for(i = 0; i < SAMPLE; i++) {
-        sd += pow(res[i] - average, 2);
-    }
-    sd = sqrt(sd / (float) SAMPLE);
-    printf("Standard Deviation: %.2lf", sd);
-    if (ms) {
-        printf("ms\n");
-    } else {
-        printf(" cycles\n");
-    }
-    return average;
+    mean = average(res, its);
+    printf("Average: %.2lf%s\n", mean, units);
+    sd = standard_dev(res, its, mean);
+    printf("Standard Deviation: %.2lf%s\n", sd, units);
+    free(res);
+    return mean;
 }

@@ -81,8 +81,8 @@ int main(int argc, char **argv) {
     info.ip = argv[1];
     info.port = atoi(argv[2]);
     setup(1);
-    experiment("3.1 Setup overhead", msetup, &info, 10, 1, 1);
-    experiment("3.2 Teardown overhead", mteardown, &info, 10, 1, 1);
+    experiment("3.1 Setup overhead", msetup, &info, 10, "ms");
+    experiment("3.2 Teardown overhead", mteardown, &info, 10, "ms");
     disable_counters();
     return 0;
 }

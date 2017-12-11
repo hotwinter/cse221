@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     info.ip = argv[1];
     info.port = atoi(argv[2]);
     setup(1);
-    experiment("2. Bandwidth", bw, &info, 1, 0, 1);
+    experiment("2. Bandwidth", bw, &info, 1, "ms");
     disable_counters();
     return 0;
 }

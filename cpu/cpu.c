@@ -123,7 +123,7 @@ void do_procedure_experiment() {
     memset(desc, 0, 100);
     for(i = 0; i < 8; i++) {
         snprintf(desc, sizeof(desc), "2. Procedure call overhead (%d)", i);
-        experiment(desc, func_overhead, (void *) &i, 10000, 0, 0);
+        experiment(desc, func_overhead, (void *) &i, 10000, " cycles");
     }
 }
 
@@ -265,13 +265,13 @@ float context_switch_kernel() {
 int main(int argc, char **argv) {
 
     setup(0);
-    experiment("1.1 Read Time Overhead", readtime_overhead, NULL, 10000, 1, 0);
-    experiment("1.2 Loop Overhead", loop_overhead, NULL, 10000, 1, 0);
+    experiment("1.1 Read Time Overhead", readtime_overhead, NULL, 10000, " cycles");
+    experiment("1.2 Loop Overhead", loop_overhead, NULL, 10000, " cycles");
     do_procedure_experiment();
-    experiment("3.1 Process Overhead", process_overhead, NULL, 1000, 1, 0);
-    experiment("3.2 Kernel Process Overhead", kernel_thread_overhead, NULL, 1000, 1, 0);
-    experiment("4.1 Process Context Switch Overhead", context_switch_user, NULL, 1000, 1, 0);
-    experiment("4.2 Kernel Thread Context Switch Overhead", context_switch_kernel, NULL, 1000, 1, 0);
+    experiment("3.1 Process Overhead", process_overhead, NULL, 1000, " cycles");
+    experiment("3.2 Kernel Process Overhead", kernel_thread_overhead, NULL, 1000, " cycles");
+    experiment("4.1 Process Context Switch Overhead", context_switch_user, NULL, 1000, " cycles");
+    experiment("4.2 Kernel Thread Context Switch Overhead", context_switch_kernel, NULL, 1000, " cycles");
     disable_counters();
     return 0;
 }

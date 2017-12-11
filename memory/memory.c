@@ -6,14 +6,14 @@
 // Loop overhead under -O2
 #define LOOP_OVERHEAD 0.38
 // 4MB
-#define ARRAY_SIZE 8388608
+#define ARRAY_SIZE MB(4)
 //#define ALLOC_SIZE 128
 //#define STEP_SIZE 2097152
 #define STEP_SIZE 1
 // 2GB
-#define FILE_SIZE 2147483648
+#define FILE_SIZE GB(2)
 // 16MB
-#define PAGE_SEP 16777216
+#define PAGE_SEP MB(16)
 
 struct params {
     int stride_size;
@@ -57,7 +57,7 @@ void do_access_time() {
         for(array_size = 4 * 1024; array_size <= 128 * 1024 * 1024; array_size *= 2) {
             params.array_size = array_size;
             snprintf(desc, sizeof(desc), "Stride %d, Array Size %d", strides[i], array_size);
-            experiment(desc, access_time, &params, 1, 0, 0);
+            experiment(desc, access_time, &params, 1, " cycles");
         }
         printf("\n");
     }
@@ -207,7 +207,7 @@ char* page_fault_setup(char *fname, int *sfd) {
     *sfd = fd;
     ret = system("echo 3 > /proc/sys/vm/drop_caches");
     if (ret != 0) {
-        perror("ret");
+        perror("system");
         exit(EXIT_FAILURE);
     }
     return (char *) res;
@@ -239,14 +239,14 @@ int main(int argc, char **argv) {
 
     setup(0);
     do_access_time();
-    readc = experiment("2.1 RAM Read Time", read_time, &i, 100, 0, 0);
+    readc = experiment("2.1 RAM Read Time", read_time, &i, 100, " cycles");
     bw = bandwidth(readc);
     printf("Read Bandwidth is %.2f GB/s\n", bw);
-    writec = experiment("2.2 RAM Write Time", write_time, NULL, 100, 0, 0);
+    writec = experiment("2.2 RAM Write Time", write_time, NULL, 100, " cycles");
     bw = bandwidth(writec);
     printf("Write Bandwidth is %.2f GB/s\n", bw);
     get_root();
-    experiment("3 Page Fault Service Time", page_fault_time, NULL, 10, 1, 1);
+    experiment("3 Page Fault Service Time", page_fault_time, NULL, 10, " cycles");
     disable_counters();
     return 0;
 }

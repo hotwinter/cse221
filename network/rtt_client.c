@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     info.ip = argv[1];
     info.port = atoi(argv[2]);
     setup(1);
-    experiment("1. RTT", rtt, &info, 10, 0, 1);
+    experiment("1. RTT", rtt, &info, 10, "ms");
     disable_counters();
     return 0;
 }

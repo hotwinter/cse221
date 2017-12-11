@@ -1,0 +1,47 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+#include "util.h"
+
+#define FILE_SIZE GB(8)
+float file_cache(void *args) {
+    unsigned int size = *((unsigned int *) args);
+    int ret, fd;
+    char buf[PAGE_SIZE];
+    uint64_t prev, after;
+    void *res;
+
+    ret = system("echo 3 > /proc/sys/vm/drop_caches");
+    if (ret < 0) {
+        perror("system");
+        exit(EXIT_FAILURE);
+    }
+    fd = open("8g", O_RDONLY | O_SYNC);
+	if(fd < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    read(fd, buf, PAGE_SIZE);
+    lseek(fd, size, SEEK_SET);
+	prev = read_counter();
+	read(fd, buf, PAGE_SIZE); 
+	after = read_counter();
+    close(fd);
+    return (float)(after - prev);
+}
+
+int main(int argc, char **argv) {
+    int i;
+    unsigned int sizes[11] = {KB(4), KB(8), MB(1), MB(10), MB(100), MB(200), MB(400), MB(800), GB(1), GB(2), GB(3)};
+    char desc[100];
+
+    setup(0);
+    get_root();
+    printf("1. File Cache\n");
+    for(i = 0; i < sizeof(sizes) / sizeof(sizes[0]); i++) {
+        snprintf(desc, sizeof(desc), "%u: ", sizes[i]);
+        experiment(desc, file_cache, sizes + i, 10, 0, 0);
+    }
+    disable_counters();
+    return 0;
+}
