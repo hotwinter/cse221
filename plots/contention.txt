@@ -1,0 +1,48 @@
+Child #0:
+Average: 405.80us
+Standard Deviation: 2.48us
+Child #1:
+Average: 679.50us
+Standard Deviation: 219.34us
+Child #2:
+Average: 944.60us
+Standard Deviation: 268.75us
+Child #3:
+Average: 811.60us
+Standard Deviation: 231.73us
+Child #4:
+Average: 612.70us
+Standard Deviation: 329.86us
+Child #5:
+Average: 705.20us
+Standard Deviation: 569.24us
+Child #6:
+Average: 805.80us
+Standard Deviation: 346.85us
+Child #7:
+Average: 783.70us
+Standard Deviation: 98.33us
+Child #0:
+Average: 755.40us
+Standard Deviation: 12.37us
+Child #1:
+Average: 1115.40us
+Standard Deviation: 170.88us
+Child #2:
+Average: 1406.90us
+Standard Deviation: 451.99us
+Child #3:
+Average: 1526.90us
+Standard Deviation: 232.01us
+Child #4:
+Average: 1456.10us
+Standard Deviation: 481.38us
+Child #5:
+Average: 869.10us
+Standard Deviation: 173.49us
+Child #6:
+Average: 950.90us
+Standard Deviation: 303.14us
+Child #7:
+Average: 866.80us
+Standard Deviation: 177.73us

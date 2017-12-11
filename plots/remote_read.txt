@@ -1,0 +1,48 @@
+16384: 
+Average: 15.23ms
+Standard Deviation: 2.34ms
+65536: 
+Average: 13.71ms
+Standard Deviation: 1.51ms
+131072: 
+Average: 13.53ms
+Standard Deviation: 1.42ms
+262144: 
+Average: 15.85ms
+Standard Deviation: 2.88ms
+524288: 
+Average: 15.63ms
+Standard Deviation: 7.08ms
+1048576: 
+Average: 15.51ms
+Standard Deviation: 1.61ms
+2097152: 
+Average: 15.32ms
+Standard Deviation: 1.74ms
+4194304: 
+Average: 13.77ms
+Standard Deviation: 0.83ms
+16384: 
+Average: 12.80ms
+Standard Deviation: 1.22ms
+65536: 
+Average: 12.48ms
+Standard Deviation: 0.40ms
+131072: 
+Average: 12.78ms
+Standard Deviation: 0.61ms
+262144: 
+Average: 13.37ms
+Standard Deviation: 2.18ms
+524288: 
+Average: 12.96ms
+Standard Deviation: 0.61ms
+1048576: 
+Average: 13.53ms
+Standard Deviation: 0.65ms
+2097152: 
+Average: 13.45ms
+Standard Deviation: 0.36ms
+4194304: 
+Average: 13.60ms
+Standard Deviation: 0.35ms

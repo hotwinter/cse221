@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
     bw = bandwidth(writec);
     printf("Write Bandwidth is %.2f GB/s\n", bw);
     get_root();
-    experiment("3 Page Fault Service Time", page_fault_time, NULL, 10, " cycles");
+    experiment("3 Page Fault Service Time", page_fault_time, NULL, 100, " cycles");
     disable_counters();
     return 0;
 }

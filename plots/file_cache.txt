@@ -1,0 +1,75 @@
+16384: 
+Average: 3.45us
+Standard Deviation: 0.29us
+65536: 
+Average: 5.77us
+Standard Deviation: 0.96us
+262144: 
+Average: 4.03us
+Standard Deviation: 0.11us
+1048576: 
+Average: 5.27us
+Standard Deviation: 0.46us
+4194304: 
+Average: 4.65us
+Standard Deviation: 0.20us
+16777216: 
+Average: 4.46us
+Standard Deviation: 0.28us
+67108864: 
+Average: 4.09us
+Standard Deviation: 0.04us
+268435456: 
+Average: 3.54us
+Standard Deviation: 0.03us
+419430400: 
+Average: 3.38us
+Standard Deviation: 0.02us
+629145600: 
+Average: 3.29us
+Standard Deviation: 0.06us
+786432000: 
+Average: 3.28us
+Standard Deviation: 0.02us
+838860800: 
+Average: 3.26us
+Standard Deviation: 0.04us
+891289600: 
+Average: 11.92us
+Standard Deviation: 12.32us
+912261120: 
+Average: 11.39us
+Standard Deviation: 11.34us
+922746880: 
+Average: 26.11us
+Standard Deviation: 9.41us
+933232640: 
+Average: 31.01us
+Standard Deviation: 0.21us
+943718400: 
+Average: 31.06us
+Standard Deviation: 0.38us
+954204160: 
+Average: 31.62us
+Standard Deviation: 1.65us
+964689920: 
+Average: 30.92us
+Standard Deviation: 0.08us
+975175680: 
+Average: 31.02us
+Standard Deviation: 0.17us
+996147200: 
+Average: 31.21us
+Standard Deviation: 0.33us
+1073741824: 
+Average: 31.07us
+Standard Deviation: 0.40us
+1084227584: 
+Average: 31.08us
+Standard Deviation: 0.44us
+1126170624: 
+Average: 30.91us
+Standard Deviation: 0.20us
+1178599424: 
+Average: 34.49us
+Standard Deviation: 0.63us

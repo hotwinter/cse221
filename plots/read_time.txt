@@ -1,0 +1,54 @@
+16384: 
+Average: 759.12us
+Standard Deviation: 32.50us
+65536: 
+Average: 795.09us
+Standard Deviation: 145.29us
+131072: 
+Average: 864.21us
+Standard Deviation: 339.09us
+262144: 
+Average: 747.21us
+Standard Deviation: 9.08us
+524288: 
+Average: 758.97us
+Standard Deviation: 21.53us
+1048576: 
+Average: 788.49us
+Standard Deviation: 46.83us
+2097152: 
+Average: 843.68us
+Standard Deviation: 82.23us
+4194304: 
+Average: 651.60us
+Standard Deviation: 157.26us
+8388608: 
+Average: 912.64us
+Standard Deviation: 82.18us
+16384: 
+Average: 756.55us
+Standard Deviation: 8.26us
+65536: 
+Average: 751.06us
+Standard Deviation: 8.95us
+131072: 
+Average: 557.52us
+Standard Deviation: 181.81us
+262144: 
+Average: 678.05us
+Standard Deviation: 137.05us
+524288: 
+Average: 757.98us
+Standard Deviation: 14.72us
+1048576: 
+Average: 620.16us
+Standard Deviation: 168.41us
+2097152: 
+Average: 674.77us
+Standard Deviation: 192.72us
+4194304: 
+Average: 676.76us
+Standard Deviation: 149.38us
+8388608: 
+Average: 950.81us
+Standard Deviation: 49.39us
